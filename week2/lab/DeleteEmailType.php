@@ -11,18 +11,18 @@ include './bootstrap.php';
     $pdo = new DB($dbConfig);
     $db = $pdo->getDB();
     
-    $model = new EmailModel();
-    $DAO = new EmailDAO($db);
+    $model = new EmailTypeModel();
+    $DAO = new EmailTypeDAO($db);
     
     // get values from URL
-    $emailDAO = filter_input(INPUT_GET, 'id');
+    $emailTypeDAO = filter_input(INPUT_GET, 'id');
     
-    $DAO->delete($model->getEmailid());
-    if ( NULL !== $emailDAO ) {
+    $DAO->delete($model->getEmailTypeid());
+    if ( NULL !== $emailTypeDAO ) {
         
 
-        if ( $DAO->delete($emailDAO) ) {
-            echo 'Email was deleted';
+        if ( $DAO->delete($emailTypeDAO) ) {
+            echo 'Email Type was deleted';
         }
     }
 
