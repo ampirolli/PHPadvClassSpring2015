@@ -4,6 +4,7 @@ namespace App\models\services;
 
 use App\models\interfaces\IController;
 use App\models\interfaces\ILogging;
+use App\models\interfaces\IService;
 use Exception;
 
  final class Index {
@@ -44,30 +45,32 @@ use Exception;
         /**
          * Run the application!
          */
-        public function run(Scope $scope) {  
+        public function run(IService $scope) {  
             $page = $this->getPage();
             if ( !$this->runController($page,$scope) ) {
-                throw new PageNotFoundException('Unsafe page "' . $page . '" requested');               
+                throw new ControllerFailedException('Controller for page "' . $page . '" failed');               
             }          
         }
         
         
-        protected function runController($page, Scope $scope) {
+        protected function runController($page, IService $scope) {
                        
             $class_name = $this->getPageController($page);
             $controller = NULL;
+                       
             
             if (array_key_exists($class_name,$this->DI)) {                
                 $controller = $this->DI[$class_name]();                
             } else { 
-                $class_name = "APP\\controller\\$class_name"; 
+                $class_name = "APP\\controller\\$class_name";
                 if (class_exists($class_name)) {
                     $controller = new $class_name();
+                    
                 }
             }
             
-            if ( $controller instanceof IController ) { 
-                return $controller->execute($scope);                   
+            if ( $controller instanceof IController ) {
+                return $controller->execute($scope);
             }
                         
             return false;
@@ -98,6 +101,7 @@ use Exception;
             $className = end( $baseName );     
             
             $folders = array(   "mvc".DIRECTORY_SEPARATOR."controllers",
+                                "mvc".DIRECTORY_SEPARATOR."models".DIRECTORY_SEPARATOR."helpers",
                                 "mvc".DIRECTORY_SEPARATOR."models".DIRECTORY_SEPARATOR."dao",
                                 "mvc".DIRECTORY_SEPARATOR."models".DIRECTORY_SEPARATOR."do",
                                 "mvc".DIRECTORY_SEPARATOR."models".DIRECTORY_SEPARATOR."interfaces",
@@ -129,11 +133,12 @@ use Exception;
             return ucfirst(strtolower($page)).'Controller';
         }
 
-        protected function checkPage($page) {
+        protected function checkPage($page) {            
             if ( !( is_string($page) && preg_match('/^[a-z0-9-]+$/i', $page) != 0 ) ) {
                 // TODO log attempt, redirect attacker, ...
                throw new PageNotFoundException('Unsafe page "' . $page . '" requested');
-            }                     
+            }        
+            
             return $page;
         }
         
@@ -179,17 +184,36 @@ use Exception;
         $_scope = new Scope();
         $_scope->util = new Util();
         $_validator = new Validator();
+        
+        $_phoneTypemodel = new PhoneTypeModel();
+        $_phonemodel = new PhoneModel();
+        
+        $_phoneTypeDAO = new PhoneTypeDAO($_pdo->getDB(), $_phoneTypemodel, $_log);
+        $_phoneDAO = new PhoneDAO($_pdo->getDB(), $_phonemodel, $_log);
+        
+        
+        $_phoneTypeService = new PhoneTypeService($_phoneTypeDAO, $_validator, $_phoneTypemodel );
+        $_phoneService = new PhoneService($_phoneDAO, $_phoneTypeService, $_validator, $_phonemodel);
+        
+         $_testService = new TestService();
+        
         //http://php.net/manual/en/functions.anonymous.php
 
         $index->addDIController('index', function() {            
             return new \APP\controller\IndexController();
         })
-        ->addDIController('phonetype', function() use ($_pdo,$_validator,$_log ) {
-            $_model = new PhoneTypeModel();
-            $_DAO = new PhoneTypeDAO($_pdo->getDB(), $_model, $_log);
-            $_service = new PhoneTypeService($_DAO, $_validator);
-            return new \APP\controller\PhonetypeController($_service, $_model);
-        });
+        ->addDIController('phonetype', function() use ($_phoneTypeService ) { 
+            return new \APP\controller\PhonetypeController($_phoneTypeService);
+        })
+        
+        ->addDIController('phone', function() use ($_phoneService ) {                        
+            return new \APP\controller\PhoneController($_phoneService);
+        })
+        ->addDIController('test', function()  use ($_testService ){           
+            return new \APP\controller\TestController($_testService);
+        })
+        
+        ;
         // run application!
         $index->run($_scope);
     }

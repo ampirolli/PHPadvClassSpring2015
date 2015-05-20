@@ -6,9 +6,9 @@
  * @author GForti
  */
 
-namespace App\models\services;
+namespace API\models\services;
 
-use App\models\interfaces\IService;
+use API\models\interfaces\IService;
 
 class Validator implements IService {
     
@@ -33,7 +33,7 @@ class Validator implements IService {
      * @return boolean
      */
     public function phoneIsValid($phone) {
-        return ( preg_match("/^[0-9]{3}-[0-9]{4}-[0-9]{4}$/", $phone) );
+        return ( preg_match("/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/", $phone) );
     }
     
     /**
@@ -55,6 +55,6 @@ class Validator implements IService {
      * @return boolean
      */
     public function activeIsValid($type) {
-        return ( is_string($type) && preg_match("/^[0-1]$/", $type) );
+        return ( (is_string($type) || is_numeric($type)) && preg_match("/^[0-1]$/", $type) );
     }
 }

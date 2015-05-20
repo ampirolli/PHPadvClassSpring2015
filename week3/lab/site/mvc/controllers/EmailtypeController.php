@@ -1,34 +1,21 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- * Description of EmailtypeController
- *
- * @author 001329606
- */
-
 namespace APP\controller;
 
 use App\models\interfaces\IController;
-use App\models\services\Scope;
 use App\models\interfaces\IService;
-use App\models\interfaces\IModel;
 
 class EmailtypeController extends BaseController implements IController {
        
-    public function __construct( IService $EmailTypeService, IModel $model  ) {                
+    public function __construct( IService $EmailTypeService ) {                
         $this->service = $EmailTypeService;     
-        $this->data['model'] = $model;
+        
     }
 
 
-    public function execute(Scope $scope) {
+    public function execute(IService $scope) {
                 
+        $this->data['model'] = $this->service->getNewEmailTypeModel();
         $this->data['model']->reset();
         $viewPage = 'emailtype';
         

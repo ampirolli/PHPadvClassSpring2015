@@ -4,6 +4,7 @@ namespace App\models\services;
 
 use App\models\interfaces\IController;
 use App\models\interfaces\ILogging;
+use App\models\interfaces\IService;
 use Exception;
 
  final class Index {
@@ -25,9 +26,8 @@ use Exception;
          $this->DI[$this->getPageController($page)] = $func;
          return $this;
      }
-          /**
-         * System config.
-         */
+
+        //System config
         public function __construct() {
             // error reporting - all errors for development (ensure you have display_errors = On in your php.ini file)
             error_reporting(E_ALL | E_STRICT);
@@ -41,41 +41,40 @@ use Exception;
             $this->DI = array();
         }
 
-        /**
-         * Run the application!
-         */
-        public function run(Scope $scope) {  
+        
+        //Run the application
+        public function run(IService $scope) {  
             $page = $this->getPage();
             if ( !$this->runController($page,$scope) ) {
-                throw new PageNotFoundException('Unsafe page "' . $page . '" requested');               
+                throw new ControllerFailedException('Controller for page "' . $page . '" failed');               
             }          
         }
         
         
-        protected function runController($page, Scope $scope) {
+        protected function runController($page, IService $scope) {
                        
             $class_name = $this->getPageController($page);
             $controller = NULL;
+                       
             
             if (array_key_exists($class_name,$this->DI)) {                
                 $controller = $this->DI[$class_name]();                
             } else { 
-                $class_name = "APP\\controller\\$class_name"; 
+                $class_name = "APP\\controller\\$class_name";
                 if (class_exists($class_name)) {
                     $controller = new $class_name();
+                    
                 }
             }
             
-            if ( $controller instanceof IController ) { 
-                return $controller->execute($scope);                   
+            if ( $controller instanceof IController ) {
+                return $controller->execute($scope);
             }
                         
             return false;
         }
                
-        /**
-         * Exception handler.
-         */
+        //Exception handler
         public function handleException(Exception $ex) {     
             
             if ($ex instanceof PageNotFoundException) {  
@@ -89,15 +88,14 @@ use Exception;
             
         }
 
-        /**
-         * Class loader.
-         */
+        //Class loader
         public function loadClass($base) {
             
             $baseName = explode( '\\', $base );
             $className = end( $baseName );     
             
             $folders = array(   "mvc".DIRECTORY_SEPARATOR."controllers",
+                                "mvc".DIRECTORY_SEPARATOR."models".DIRECTORY_SEPARATOR."helpers",
                                 "mvc".DIRECTORY_SEPARATOR."models".DIRECTORY_SEPARATOR."dao",
                                 "mvc".DIRECTORY_SEPARATOR."models".DIRECTORY_SEPARATOR."do",
                                 "mvc".DIRECTORY_SEPARATOR."models".DIRECTORY_SEPARATOR."interfaces",
@@ -129,31 +127,23 @@ use Exception;
             return ucfirst(strtolower($page)).'Controller';
         }
 
-        protected function checkPage($page) {
+        protected function checkPage($page) {            
             if ( !( is_string($page) && preg_match('/^[a-z0-9-]+$/i', $page) != 0 ) ) {
-                // TODO log attempt, redirect attacker, ...
+                //TODO log attempt, redirect attacker
                throw new PageNotFoundException('Unsafe page "' . $page . '" requested');
-            }                     
+            }        
+            
             return $page;
         }
         
         
-        
-        
-    /**
-     * Generate link.
-     * @param string $page target page
-     * @param array $params page parameters
-     */
+           
+    //Generate link
     public function createLink($page, array $params = array()) {        
         return $page . '?' .http_build_query($params);
     }
     
-     /**
-     * Redirect to the given page.
-     * @param type $page target page
-     * @param array $params page parameters
-     */
+    //Redirect to the given page
     public function redirect($page, array $params = array()) {
         header('Location: ' . $this->createLink($page, $params));
         die();
@@ -162,16 +152,11 @@ use Exception;
 }
 
 
-
-       
-    //http://php.net/manual/en/language.oop5.typehinting.php
     function runPage() {
         $_configURL = '.' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.ini.php';
         $index = new Index();
 
-        /*
-         * Functions to use for Dependency Injection
-         */
+        //Functions to use for Dependency Injection
         $_config = new Config($_configURL);
         $_log = new FileLogging();
         $index->setLog($_log);
@@ -179,18 +164,36 @@ use Exception;
         $_scope = new Scope();
         $_scope->util = new Util();
         $_validator = new Validator();
-        //http://php.net/manual/en/functions.anonymous.php
+        
+        $_emailTypemodel = new EmailTypeModel();
+        $_emailmodel = new EmailModel();
+        
+        $_emailTypeDAO = new EmailTypeDAO($_pdo->getDB(), $_emailTypemodel, $_log);
+        $_emailDAO = new EmailDAO($_pdo->getDB(), $_emailmodel, $_log);
+        
+        
+        $_emailTypeService = new EmailTypeService($_emailTypeDAO, $_validator, $_emailTypemodel );
+        $_emailService = new EmailService($_emailDAO, $_emailTypeService, $_validator, $_emailmodel);
+        
+         $_testService = new TestService();
+        
 
         $index->addDIController('index', function() {            
             return new \APP\controller\IndexController();
         })
-        ->addDIController('phonetype', function() use ($_pdo,$_validator,$_log ) {
-            $_model = new PhoneTypeModel();
-            $_DAO = new PhoneTypeDAO($_pdo->getDB(), $_model, $_log);
-            $_service = new PhoneTypeService($_DAO, $_validator);
-            return new \APP\controller\PhonetypeController($_service, $_model);
-        });
-        // run application!
+        ->addDIController('emailtype', function() use ($_emailTypeService ) { 
+            return new \APP\controller\EmailtypeController($_emailTypeService);
+        })
+        
+        ->addDIController('email', function() use ($_emailService ) {                        
+            return new \APP\controller\EmailController($_emailService);
+        })
+        ->addDIController('test', function()  use ($_testService ){           
+            return new \APP\controller\TestController($_testService);
+        })
+        
+        ;
+        //run application
         $index->run($_scope);
     }
     
