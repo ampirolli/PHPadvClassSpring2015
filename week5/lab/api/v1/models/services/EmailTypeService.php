@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of PhoneTypeService
+ * Description of EmailTypeService
  *
  * @author User
  */
@@ -12,7 +12,7 @@ use API\models\interfaces\IDAO;
 use API\models\interfaces\IService;
 use API\models\interfaces\IModel;
 
-class PhoneTypeService implements IService {
+class EmailTypeService implements IService {
     
      protected $DAO;
      protected $validator;
@@ -43,8 +43,8 @@ class PhoneTypeService implements IService {
          $this->DAO = $DAO;
      }
 
-    public function __construct( IDAO $PhoneTypeDAO, IService $validator,IModel $model  ) {
-        $this->setDAO($PhoneTypeDAO);
+    public function __construct( IDAO $EmailTypeDAO, IService $validator,IModel $model  ) {
+        $this->setDAO($EmailTypeDAO);
         $this->setValidator($validator);
         $this->setModel($model);
     }
@@ -84,12 +84,12 @@ class PhoneTypeService implements IService {
     
     public function validate( IModel $model ) {
         $errors = array();
-        if ( !$this->getValidator()->phoneTypeIsValid($model->getPhonetype()) ) {
-            $errors[] = 'Phone Type is invalid';
+        if ( !$this->getValidator()->emailTypeIsValid($model->getEmailtype()) ) {
+            $errors[] = 'Email Type is invalid';
         }
                
         if ( !$this->getValidator()->activeIsValid($model->getActive()) ) {
-            $errors[] = 'Phone active is invalid';
+            $errors[] = 'Email active is invalid';
         }
        
         
@@ -97,7 +97,7 @@ class PhoneTypeService implements IService {
     }
     
     
-    public function getNewPhoneTypeModel() {
+    public function getNewEmailTypeModel() {
         return clone $this->getModel();
     }
     

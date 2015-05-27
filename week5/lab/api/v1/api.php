@@ -76,7 +76,7 @@ final class Index {
 
     $_restServer->addDIResourceRequest('emailtypes', function() use ($_emailTypeService ) {       
         return new EmailtypeRequest($_emailTypeService);
-    })    
+    })   
     ->addDIResourceRequest('emails', function() use ($_emailService ) {       
         return new EmailRequest($_emailService);
     })
