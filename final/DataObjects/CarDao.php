@@ -28,6 +28,7 @@ class CarDao {
     }
     
     function getAvailable(){
+         $values = array();
         $db = $this->getDB();
         $stmt = $db->prepare("SELECT * FROM final_carrental where available = 1");
         

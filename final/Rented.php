@@ -1,10 +1,7 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head>
-    <?php include './bootstrap.php'; ?>
-
-
-    <title>Available</title>
+    <title>Rented</title>
     <style type="text/css">
         #Year
         {
@@ -21,7 +18,8 @@
     </style>
 </head>
 <body>
-    <?php
+    
+        <?php
         // put your code here
         $dbConfig = array(
             "DB_DNS"=>'mysql:host=localhost;port=3306;dbname=PHPadvClassSpring2015',
@@ -37,7 +35,6 @@
     
     
     ?>
-    
     
 <div>
     <a href="AvailableForRent.php" style="border-style: outset; border-width: medium"> Avaliable for Rent </a>&nbsp;&nbsp;
@@ -64,6 +61,7 @@
 
 <div id = "results" style="border-style: inset; border-width: medium">
 
+    
     <ul>
         <?php 
         foreach($availableCars as $value)
@@ -78,6 +76,8 @@
     </ul>
     
 </div>
+
+
 
 
 </body>
