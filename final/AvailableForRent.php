@@ -1,23 +1,26 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head>
-    <?php include './bootstrap.php'; ?>
+    <?php include './bootstrap.php';
+    
+    function isPostRequest() {
+        return ( filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST' );
+    }
+    
+    function isGetRequest() {
+        return ( filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'GET' );
+    }
+    
+    ?>
 
 
     <title>Available</title>
     <style type="text/css">
-        #Year
+        #CustomerId
         {
             width: 100px;
         }
-        #Make
-        {
-            width: 100px;
-        }
-        #Model
-        {
-            width: 125px;
-        }
+
     </style>
 </head>
 <body>
@@ -33,8 +36,17 @@
     $db = $pdo->getDB();
         
     $cars = new CarDao($db);
+    $customers = new RenterDao($db);
+    $RenterId = $customers->getAllRows();
     $availableCars = $cars->getAvailable();
     
+    
+    if(isPostRequest())
+    {
+        $customerId = filter_input(INPUT_POST, 'customerId');
+        var_dump($customerId);
+        
+    }
     
     ?>
     
@@ -47,30 +59,19 @@
 </div>
 <br />
 <br />
-<div>
 
-    <select id="Year" name="Year">
-        <option></option>
-    </select>&nbsp;&nbsp;
-
-    <select id="Make" name="Make">
-        <option></option>
-    </select>&nbsp;&nbsp;
-    
-    <select id="Model" name="Model">
-        <option></option>
-    </select><br />
-    </div>
 
 <div id = "results" style="border-style: inset; border-width: medium">
 
     <ul>
         <?php 
+        
         foreach($availableCars as $value)
         {
-            
-            
-            
+            echo '<li>';
+            echo $value->getCarMake(), ' ', $value->getCarName(),'- id: ' ,$value->getCarID(), ' ';
+            echo '<a href="RentCar.php">Rent</a>';
+            echo '</li>';
         }
         
         ?>

@@ -13,7 +13,7 @@
  */
 class CarDao {
     
-     private $DB = null;
+    private $DB = null;
 
     public function __construct( PDO $db ) {        
         $this->setDB($db);    
@@ -28,9 +28,9 @@ class CarDao {
     }
     
     function getAvailable(){
-         $values = array();
+        $values = array();
         $db = $this->getDB();
-        $stmt = $db->prepare("SELECT * FROM final_carrental where available = 1");
+        $stmt = $db->prepare("SELECT * FROM final_carrental WHERE rentable = 1");
         
         if ( $stmt->execute() && $stmt->rowCount() > 0 ) {
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -45,13 +45,31 @@ class CarDao {
            //log($db->errorInfo() .$stmt->queryString ) ;           
         }  
         
-        $stmt->closeCursor();         
+         $stmt->closeCursor();         
          return $values;
      }
     
     
-    function getUnAvailable($id)
+    function getUnAvailable()
     {
+        $values = array();
+        $db = $this->getDB();
+        $stmt = $db->prepare("SELECT * FROM final_carrental WHERE rentable = 0");
         
+        if ( $stmt->execute() && $stmt->rowCount() > 0 ) {
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($results as $value) {
+               $model = new Car();
+               $model->reset()->map($value);
+               $values[] = $model;
+            }
+             
+        }   else {            
+           //log($db->errorInfo() .$stmt->queryString ) ;           
+        }  
+        
+         $stmt->closeCursor();         
+         return $values;
     }
 }

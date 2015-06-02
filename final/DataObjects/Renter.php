@@ -75,6 +75,18 @@ class Renter {
     function setRentalID($RentalID) {
         $this->RentalID = $RentalID;
     }
+    
+     public function reset() {
+        $this->setCustomerID('');
+        $this->setName('');
+        $this->setAddress('');
+        $this->setInsuranceProvider('');
+        $this->setCarRented('');
+        $this->setCarID('');
+        $this->setRentalID('');
+
+        return $this;
+    }
 
      public function map(array $values) {
         

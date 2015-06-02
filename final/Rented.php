@@ -32,7 +32,7 @@
     $db = $pdo->getDB();
         
     $cars = new CarDao($db);
-    $availableCars = $cars->getAvailable();
+    $availableCars = $cars->getUnAvailable();
     
     
     ?>
@@ -68,7 +68,9 @@
         foreach($availableCars as $value)
         {
             
-            
+            echo '<li>';
+            echo $value->getCarMake(), ' ', $value->getCarName(),'- id: ' ,$value->getCarID(),'- Rented To: ', $value->getCustomerID() ,'  <input type="submit" value="Return"/>';
+            echo '</li>';
             
         }
         

@@ -75,6 +75,51 @@ class Car {
     function setRentalID($RentalID) {
         $this->RentalID = $RentalID;
     }
+    
+    public function reset() {
+        $this->setCarName('');
+        $this->setCustomerID('');
+        $this->setCarMake('');
+        $this->setCarID('');
+        $this->setRentable('');
+        $this->setWeeksToBeRented('');
+        $this->setRentalID('');
+
+        return $this;
+    }
+    
+    public function map(array $values) {
+        
+        if ( array_key_exists('carName', $values) ) {
+            $this->setCarName($values['carName']);
+        }
+        
+        if ( array_key_exists('CustomerID', $values) ) {
+            $this->setCustomerID($values['CustomerID']);
+        }
+        
+        if ( array_key_exists('CarMake', $values) ) {
+            $this->setCarMake($values['CarMake']);
+        }
+        
+        if ( array_key_exists('CarID', $values) ) {
+            $this->setCarID($values['CarID']);
+        }
+        
+        if ( array_key_exists('Rentable', $values) ) {
+            $this->setRentable($values['Rentable']);
+        }
+        
+        if ( array_key_exists('WeeksToBeRented', $values) ) {
+            $this->setWeeksToBeRented($values['WeeksToBeRented']);
+        }
+        
+        if ( array_key_exists('RentalID', $values) ) {
+            $this->setRentalID($values['RentalID']);
+        }
+        
+        return $this;
+    }
 
 
 }
