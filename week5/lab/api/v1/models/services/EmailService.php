@@ -1,9 +1,4 @@
 <?php
-/**
- * Description of EmailService
- *
- * @author GFORTI
- */
 
 namespace API\models\services;
 
@@ -11,16 +6,18 @@ use API\models\interfaces\IDAO;
 use API\models\interfaces\IService;
 use API\models\interfaces\IModel;
 
-class EmailService implements IService {
-    
+
+class EmailService implements IService 
+{
     protected $emailDAO;
     protected $emailTypeService;
     protected $validator;
     protected $model;
-                function getValidator() {
+    
+    function getValidator() {
         return $this->validator;
     }
-
+    
     function setValidator($validator) {
         $this->validator = $validator;
     }                
@@ -32,7 +29,7 @@ class EmailService implements IService {
     function setEmailDAO(IDAO $DAO) {
         $this->emailDAO = $DAO;
     }
-    
+ 
     function getEmailTypeService() {
         return $this->emailTypeService;
     }
@@ -50,11 +47,11 @@ class EmailService implements IService {
         $this->model = $model;
     }
 
-        public function __construct( IDAO $emailDAO, IService $emailTypeService, IService $validator, IModel $model  ) {
-        $this->setEmailDAO($emailDAO);
-        $this->setEmailTypeService($emailTypeService);
-        $this->setValidator($validator);
-        $this->setModel($model);
+    public function __construct( IDAO $emailDAO, IService $emailTypeService, IService $validator, IModel $model  ) {
+    $this->setEmailDAO($emailDAO);
+    $this->setEmailTypeService($emailTypeService);
+    $this->setValidator($validator);
+    $this->setModel($model);
     }
     
     
@@ -63,7 +60,7 @@ class EmailService implements IService {
         
     }
     
-     public function getAllRows() {       
+     public function getAllEmails() {       
         return $this->getEmailDAO()->getAllRows();   
         
     }
@@ -80,8 +77,8 @@ class EmailService implements IService {
     public function validate( IModel $model ) {
         $errors = array();
         
-        if ( !$this->getemailTypeService()->idExist($model->getEmailtypeid()) ) {
-            $errors[] = 'Email Type is invalid';
+        if ( !$this->getEmailTypeService()->idExist($model->getEmailtypeid()) ) {
+            $errors[] = 'Email Type is invalid'.$model->getEmailtypeid();
         }
        
         if ( !$this->getValidator()->emailIsValid($model->getEmail()) ) {
@@ -95,8 +92,7 @@ class EmailService implements IService {
         
         return $errors;
     }
-    
-    public function idExist($id) {
+    public function idExisit($id) {
         return $this->getEmailDAO()->idExisit($id);
     }
     
@@ -117,10 +113,8 @@ class EmailService implements IService {
         return false;
     }
     
-    
      public function getNewEmailModel() {
         return clone $this->getModel();
     }
-    
     
 }

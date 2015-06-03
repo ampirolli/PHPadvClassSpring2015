@@ -1,19 +1,14 @@
 <?php
-
-/**
- * Description of EmailTypeService
- *
- * @author User
- */
-
 namespace API\models\services;
-
 use API\models\interfaces\IDAO;
 use API\models\interfaces\IService;
 use API\models\interfaces\IModel;
-
-class EmailTypeService implements IService {
-    
+/**
+ * Description of EmailTypeService
+ *
+ * @author 001327813
+ */
+class EmailTypeService implements IService{
      protected $DAO;
      protected $validator;
      protected $model;
@@ -100,6 +95,5 @@ class EmailTypeService implements IService {
     public function getNewEmailTypeModel() {
         return clone $this->getModel();
     }
-    
-    
+
 }

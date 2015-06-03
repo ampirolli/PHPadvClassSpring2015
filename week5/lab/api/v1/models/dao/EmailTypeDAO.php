@@ -1,10 +1,4 @@
 <?php
-/**
- * Description of EmailTypeDAO
- *
- * @author User
- */
-
 namespace API\models\services;
 
 use API\models\interfaces\IDAO;
@@ -54,8 +48,7 @@ class EmailTypeDAO extends BaseDAO implements IDAO {
          
          $binds = array( ":emailtype" => $model->getEmailtype(),
                           ":active" => $model->getActive()
-                    );
-                         
+                    );         
          if ( !$this->idExisit($model->getEmailtypeid()) ) {
              
              $stmt = $db->prepare("INSERT INTO emailtype SET emailtype = :emailtype, active = :active");
@@ -107,7 +100,8 @@ class EmailTypeDAO extends BaseDAO implements IDAO {
             $error = implode(",", $db->errorInfo());
             $this->getLog()->logError($error);
         }
-         
+         echo "ID:  " . $id;
+         echo var_dump($stmt);
          return false;
     }
     
@@ -121,16 +115,14 @@ class EmailTypeDAO extends BaseDAO implements IDAO {
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($results as $value) {
+                //Question:  how does this 'clone' work?
                $model = clone $this->getModel();
                $model->reset()->map($value);
                $values[] = $model;
             }
         }
-        
+        //Question:  What does closeCursor do?
         $stmt->closeCursor();
          return $values;
     }
-     
-    
-     
 }

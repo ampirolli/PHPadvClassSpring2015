@@ -1,19 +1,24 @@
 <?php
-
-/**
- * Description of PhotoTypeModel
- *
- * @author User
+namespace API\models\services;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
-namespace API\models\services;
-
+/**
+ * Description of EmailTypeModel
+ *
+ * @author 001332825
+ */
 
 class EmailTypeModel extends BaseModel {
     
     private $emailtypeid;
     private $emailtype;
     private $active;
+    
+    //echo var_dump($emailtypeid);
     
     function getEmailtypeid() {
         return $this->emailtypeid;
@@ -38,6 +43,5 @@ class EmailTypeModel extends BaseModel {
     function setActive($active) {
         $this->active = $active;
     }
-
-
+    
 }

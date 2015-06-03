@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Description of EmailtypeController
- *
- * @author User
- */
-
 namespace API\models\services;
 
 use API\models\interfaces\IRequest;
@@ -14,7 +8,7 @@ use API\models\interfaces\IModel;
 
 
 class EmailtypeRequest implements IRequest {
-    //put your code here
+
     
     protected $service;
             
@@ -59,6 +53,7 @@ class EmailtypeRequest implements IRequest {
     public function PUT( IModel $model ) {
         $id = intval($model->getId());
         $emailTypeModel = $this->service->getNewEmailTypeModel();
+  
         $emailTypeModel->map($model->getRequestData());
         $emailTypeModel->setEmailtypeid($id);
         
@@ -69,7 +64,7 @@ class EmailtypeRequest implements IRequest {
         if ( $this->service->update($emailTypeModel) ) {
             throw new ContentCreatedException('Created');           
         }
-        throw new ConflictRequestException('New email Type Not Updated for id ' . $id);
+        throw new ConflictRequestException('New Email Type Not Updated for id ' . $id);
     }
     
     public function DELETE( IModel $model ) {
@@ -77,6 +72,6 @@ class EmailtypeRequest implements IRequest {
         if ( $this->service->delete($id) ) {
             return null;          
         }
-        throw new ConflictRequestException($id . ' ID email Type Not Deleted');
+        throw new ConflictRequestException($id . ' ID Email Type Not Deleted');
     }
 }

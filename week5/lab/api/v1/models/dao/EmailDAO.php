@@ -1,8 +1,9 @@
 <?php
-/**
- * Description of EmailDAO
- *
- * @author GFORTI
+
+/* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 namespace API\models\services;
@@ -11,17 +12,16 @@ use API\models\interfaces\IDAO;
 use API\models\interfaces\IModel;
 use API\models\interfaces\ILogging;
 use \PDO;
-
-
-class EmailDAO extends BaseDAO implements IDAO {
-        
-     public function __construct( PDO $db, IModel $model, ILogging $log ) {        
+//inherits the BaseDAO and implements the interface
+class EmailDAO extends BaseDAO implements IDAO 
+{
+    //setting up the constructor based on all of this bad boy's depenpencies
+    public function __construct( PDO $db, IModel $model, ILogging $log ) {        
         $this->setDB($db);
         $this->setModel($model);
         $this->setLog($log);
     }
-    
-    
+    //need a function to see if an id exists in table
     public function idExisit($id) {
                 
         $db = $this->getDB();
@@ -32,7 +32,7 @@ class EmailDAO extends BaseDAO implements IDAO {
         }
          return false;
     }
-    
+    //the select statement to be used
     public function read($id) {
          
          $model = clone $this->getModel();
@@ -51,58 +51,56 @@ class EmailDAO extends BaseDAO implements IDAO {
          
         
     }
-    
-    
+    //creates a new row in the email table returning true if successful
     public function create(IModel $model) {
-                 
-         $db = $this->getDB();
-         
-         $binds = array( ":email" => $model->getemail(),
-                         ":active" => $model->getActive(),
-                         ":emailtypeid" => $model->getemailtypeid()             
-                    );
-                         
-         if ( !$this->idExisit($model->getemailid()) ) {
-             
-             $stmt = $db->prepare("INSERT INTO email SET email = :email, emailtypeid = :emailtypeid, active = :active, logged = now(), lastupdated = now()");
-             
-             if ( $stmt->execute($binds) && $stmt->rowCount() > 0 ) {
-                return true;
-             }
+
+     $db = $this->getDB();
+     //binds the data from the model to the placeholders in the insert statement
+     $binds = array( ":email" => $model->getEmail(),
+                     ":active" => $model->getActive(),
+                     ":emailtypeid" => $model->getEmailtypeid()             
+                );
+
+     if ( !$this->idExisit($model->getEmailid()) ) {
+
+         $stmt = $db->prepare("INSERT INTO email SET email = :email, emailtypeid = :emailtypeid, active = :active, logged = now(), lastupdated = now()");
+
+         if ( $stmt->execute($binds) && $stmt->rowCount() > 0 ) {
+            return true;
          }
-                  
-         
-         return false;
-    }
-    
-    
-     public function update(IModel $model) {
-                 
-         $db = $this->getDB();
-         
-        $binds = array( ":email" => $model->getEmail(),
-                        ":active" => $model->getActive(),
-                        ":emailtypeid" => $model->getEmailtypeid(),
-                        ":emailid" => $model->getEmailid()
-                    );
-         
-                
-         if ( $this->idExisit($model->getEmailid()) ) {
-            
-             $stmt = $db->prepare("UPDATE email SET email = :email, emailtypeid = :emailtypeid,  active = :active, lastupdated = now() WHERE emailid = :emailid");
-         
-             if ( $stmt->execute($binds) && $stmt->rowCount() > 0 ) {
-                return true;
-             } else {
-                 $error = implode(",", $db->errorInfo());
-                 $this->getLog()->logError($error);
-             }
-             
-         } 
-         
-         return false;
-    }
-    
+     }
+
+
+     return false;
+}
+    //updates a row in table
+    public function update(IModel $model) {
+
+             $db = $this->getDB();
+            //binds the data from the model to the placeholders in the update statement
+            $binds = array( ":email" => $model->getEmail(),
+                            ":active" => $model->getActive(),
+                            ":emailtypeid" => $model->getEmailtypeid(),
+                            ":emailid" => $model->getEmailid()
+                        );
+
+
+             if ( $this->idExisit($model->getEmailid()) ) {
+
+                 $stmt = $db->prepare("UPDATE email SET email = :email, emailtypeid = :emailtypeid,  active = :active, lastupdated = now() WHERE emailid = :emailid");
+
+                 if ( $stmt->execute($binds) && $stmt->rowCount() > 0 ) {
+                    return true;
+                 } else {
+                     $error = implode(",", $db->errorInfo());
+                     $this->getLog()->logError($error);
+                 }
+
+             } 
+
+             return false;
+        }
+    //deletes a row matching the id
     public function delete($id) {
           
         $db = $this->getDB();         
@@ -117,7 +115,7 @@ class EmailDAO extends BaseDAO implements IDAO {
          
          return false;
     }
-    
+    //gets all rows from the email table
     public function getAllRows() {
        $db = $this->getDB();
        $values = array();
@@ -139,5 +137,5 @@ class EmailDAO extends BaseDAO implements IDAO {
          return $values;
     }
     
-    
 }
+

@@ -54,14 +54,22 @@ final class Index {
     $_pdo = new DB($_config->getConfigData('db:dev'), $_log);
     $_validator = new Validator();
 
+    $_phoneTypemodel = new PhoneTypeModel();
     $_emailTypemodel = new EmailTypeModel();
+    $_phoneModel = new PhoneModel();
     $_emailModel = new EmailModel();
+
+    $_phoneTypeDAO = new PhoneTypeDAO($_pdo->getDB(), $_phoneTypemodel, $_log);
+    $_phoneDAO = new PhoneDAO($_pdo->getDB(), $_phoneModel, $_log);
 
     $_emailTypeDAO = new EmailTypeDAO($_pdo->getDB(), $_emailTypemodel, $_log);
     $_emailDAO = new EmailDAO($_pdo->getDB(), $_emailModel, $_log);
-
+    
+    $_phoneTypeService = new PhoneTypeService($_phoneTypeDAO, $_validator, $_phoneTypemodel );
+    $_phoneService = new PhoneService($_phoneDAO, $_phoneTypeService, $_validator, $_phoneModel );
+    
     $_emailTypeService = new EmailTypeService($_emailTypeDAO, $_validator, $_emailTypemodel );
-    $_emailService = new EmailService($_emailDAO, $_emailTypeService, $_validator, $_emailModel );        
+    $_emailService = new EmailService($_emailDAO, $_emailTypeService, $_validator, $_emailModel );
      
      
     /*
@@ -74,9 +82,15 @@ final class Index {
 
     //http://php.net/manual/en/functions.anonymous.php
 
-    $_restServer->addDIResourceRequest('emailtypes', function() use ($_emailTypeService ) {       
+    $_restServer->addDIResourceRequest('phonetypes', function() use ($_phoneTypeService ) {       
+        return new PhonetypeRequest($_phoneTypeService);
+    })    
+    ->addDIResourceRequest('phones', function() use ($_phoneService ) {       
+        return new PhoneRequest($_phoneService);
+    })
+    ->addDIResourceRequest('emailtypes', function() use ($_emailTypeService ) {       
         return new EmailtypeRequest($_emailTypeService);
-    })   
+    })    
     ->addDIResourceRequest('emails', function() use ($_emailService ) {       
         return new EmailRequest($_emailService);
     })

@@ -1,9 +1,4 @@
 <?php
-/**
- * Description of EmailRequest
- *
- * @author User
- */
 
 namespace API\models\services;
 
@@ -36,13 +31,13 @@ class EmailRequest implements IRequest {
         $id = intval($model->getId());
         
         if ( $id > 0 ) { 
-            if ( $this->service->idExist($model->getId()) ) {
+            if ( $this->service->idExisit($model->getId()) ) {
                 return $this->service->read($model->getId())->getAllPropteries();
             } else {
                 throw new NoContentRequestException($id . ' ID does not exist');
             }
         }
-        $data = $this->service->getAllRows();
+        $data = $this->service->getAllEmails();
         $values = array();
         
         foreach ($data as $value) {
@@ -58,21 +53,19 @@ class EmailRequest implements IRequest {
         $emailModel->map($model->getRequestData());
         $emailModel->setEmailid($id);
         
-        if ( !$this->service->idExist($id) ) {
+        if ( !$this->service->idExisit($id) ) {
             throw new NoContentRequestException($id . ' ID does not exist');
         }
         
         if ( $this->service->update($emailModel) ) {
             throw new ContentCreatedException('Created');           
         }
-                
         $errors = $this->service->validate($emailModel);
         
         if ( count($errors) > 0 ) {
-            throw new ValidationException($errors, 'Email Not Updated');
-        }        
-        
-        throw new ConflictRequestException('New Emil Not Updated for id ' . $id);
+            throw new ValidationException($errors, 'New Email Not Created');
+        }
+        throw new ConflictRequestException('New Email Not Updated for id ' . $id);
     }
     
     public function DELETE( IModel $model ) {
